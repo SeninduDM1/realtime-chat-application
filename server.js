@@ -1,5 +1,9 @@
 const express = require('express');
 const app = express();
+const mongoose = require("mongoose");
+require("dotenv").config();
+
+const User = require("./models/User");
 
 // Middelware
 app.use((req,res,next)=>{
@@ -13,17 +17,54 @@ app.get('/',(req,res)=>{
 });
 
 // About Route
-app.get('/about',()=>{
+app.get('/about',(req,res)=>{
     res.send("About Route");
 });
 
 // User Route
-app.get('/users',(req,res)=>{
-    res.json({
-        users:["Senindu","Alex","John"]
-    });
+app.get('/users',async (req,res)=>{
+    try{
+
+        const users = await User.find();
+        res.json(users);
+
+    }catch(error){
+        console.log(error);
+
+        res.status(500).json({
+            message: "Something went wrong"
+        });
+    }
 });
 
-app.listen(5000,()=>{
-    console.log("Server started on port 5000");
+app.get('/create-user',async (req,res)=>{
+
+        try{
+            const user = await User.create({
+                username:"Senindu",
+                email:"senindu@gmail.com"
+            });
+
+            res.status(201).json(user);
+
+        }catch(error){
+            console.log(error);
+            res.status(500).json({
+                message: "Something went wrong",
+            });
+        }
 });
+
+mongoose
+    .connect(process.env.MONGO_URI)
+    .then(()=>{
+        console.log("MongoDB conncted");
+
+        app.listen(5000,()=>{
+            console.log("Server is running on port 5000");
+        });
+    })
+    .catch((err)=>{
+        console.log("Error connecting to MongoDB");
+        console.log(err);
+    });
