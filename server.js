@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+app.use(express.json());
 const mongoose = require("mongoose");
 require("dotenv").config();
 
@@ -54,6 +55,29 @@ app.get('/create-user',async (req,res)=>{
             });
         }
 });
+
+
+app.post("/users",async(req,res)=>{
+    try{
+        const user = await User.create({
+            username:req.body.username,
+            email:req.body.email
+        });
+
+        res.status(201).json(user);
+
+    }catch(error){
+
+        console.log(error);
+
+        res.status(500).json({
+            message: "Something went wrong"
+        });
+
+    }
+});
+
+
 
 mongoose
     .connect(process.env.MONGO_URI)
