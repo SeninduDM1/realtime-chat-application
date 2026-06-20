@@ -104,6 +104,42 @@ app.get("/user-by-email",async (req,res)=>{
 });
 
 
+
+app.get("/user-by-username", async(req,res)=>{
+
+    try{
+
+         const user = await User.findOne({
+            username:req.query.username,
+        });
+
+        
+
+
+        if(!user){
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
+
+
+        res.json(user);
+
+
+
+
+
+    }catch(error){
+        console.log(error);
+        res.status(500).json({
+            message: "Something went wrong"
+        });
+    }
+   
+});
+    
+
+
 app.post("/users",async(req,res)=>{
     try{
         const user = await User.create({
