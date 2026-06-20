@@ -85,6 +85,25 @@ app.get('/create-user',async (req,res)=>{
 });
 
 
+app.get("/user-by-email",async (req,res)=>{
+
+    try{
+  
+        const user = await User.findOne({
+            email:req.query.email,    
+        });
+
+        res.json(user);
+
+    }catch(error){
+        console.log(error);
+        res.status(500).json({
+            message: "Something went wrong"
+        });
+    }
+});
+
+
 app.post("/users",async(req,res)=>{
     try{
         const user = await User.create({
@@ -104,6 +123,11 @@ app.post("/users",async(req,res)=>{
 
     }
 });
+
+
+
+
+
 
 
 
