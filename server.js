@@ -3,6 +3,7 @@ const app = express();
 app.use(express.json());
 const mongoose = require("mongoose");
 require("dotenv").config();
+const bcrypt = require("bcrypt");
 
 const User = require("./models/User");
 
@@ -158,9 +159,38 @@ app.post("/users",async(req,res)=>{
         });
 
     }
+
 });
 
+app.post("/register", async(req,res)=>{
 
+    try{
+
+        const hashedPassword = await bcrypt.hash(
+            req.body.password,
+            10
+        );
+
+        const user = await User.create({
+            username:req.body.username,
+            email:req.body.email,
+            password:hashedPassword,
+        });
+
+        res.status(201).json(user);
+
+    }catch(error){
+
+        console.log(error);
+
+        res.status(500).json({
+            message:"Something went wrong",
+        });
+
+    }
+
+
+});
 
 
 
