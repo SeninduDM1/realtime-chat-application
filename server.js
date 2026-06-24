@@ -166,6 +166,18 @@ app.post("/register", async(req,res)=>{
 
     try{
 
+        const existingUser = await User.findOne({
+            email:req.body.email,
+        });
+
+        if(existingUser){
+
+            return res.status(400).json({
+                message:"User already exists",
+            });
+
+        }
+
         const hashedPassword = await bcrypt.hash(
             req.body.password,
             10
@@ -189,6 +201,54 @@ app.post("/register", async(req,res)=>{
 
     }
 
+
+});
+
+app.post("/login",async(req,res)=>{
+
+    try{
+
+        const user = await User.findOne({
+            email:req.body.email,
+        });
+
+        if(!user){
+            return res.status(404).json({
+                message:"User not found",
+            });
+        }
+
+        console.log("Request Body:", req.body);
+        console.log("User:", user);
+        console.log("Password from body:", req.body.password);
+        console.log("Password from DB:", user.password);
+
+        const isMatch = await bcrypt.compare(
+            req.body.password,
+            user.password,
+        );
+
+        if(!isMatch){
+
+            return res.status(401).json({
+                message:"Invalid credentials",
+            });
+
+        }
+
+        res.json({
+            message:"Login successful",
+        });
+
+    }catch(error){
+
+        console.log(error);
+
+        res.status(500).json({
+            message:"Something went wrong",
+        });
+
+    }
 
 });
 
